@@ -15,7 +15,7 @@ The project follows the **Medallion Architecture** principles by utilizing:
 ### 2. Data Ingestion (Bronze Layer)
 * **Upload:** Ingested raw `sales.csv` data directly into the OneLake storage.
 * **Evidence:**
-![Data Ingestion](Microsoft_Fabric_Lakehouse/screenshots/Data_Ingestion.png)
+![Data Ingestion](/Microsoft_Fabric_Lakehouse/screenshots/Data_Ingestion.png)
 
 
 ### 3. Data Transformation (Gold Layer)
