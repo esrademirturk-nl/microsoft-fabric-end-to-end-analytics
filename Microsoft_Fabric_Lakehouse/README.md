@@ -21,7 +21,7 @@ The project follows the **Medallion Architecture** principles by utilizing:
 ### 3. Data Transformation (Gold Layer)
 * **Delta Conversion:** Converted raw CSV files into **Managed Delta Tables** (Parquet format).
 * **Evidence:**
-![Data Transformation](Microsoft_Fabric_Lakehouse/screenshots/Data_Transformation.png)
+![Data Transformation](/Microsoft_Fabric_Lakehouse/screenshots/Data_Transformation.png)
 
 ### 4. Analytical Layer (SQL & Visual Insights)
 The project utilized two primary methods to extract business value from the data:
@@ -35,11 +35,11 @@ GROUP BY Item
 ORDER BY Revenue DESC;
 ```
 Query Result:
-![T-SQL Analysis](Microsoft_Fabric_Lakehouse/screenshots/T-SQL_Analysis.png)
+![T-SQL Analysis](/Microsoft_Fabric_Lakehouse/screenshots/T-SQL_Analysis.png)
 
 #### B. Visual Query (Low-Code/No-Code)
 Leveraged Power Query capabilities within Fabric to transform data visually, performing group-by operations to count distinct line items per order.
-![Visual Query](Microsoft_Fabric_Lakehouse/screenshots/Visual_Query.png)
+![Visual Query](/Microsoft_Fabric_Lakehouse/screenshots/Visual_Query.png)
 
 ### 💡 Key Learnings & Takeaways
 * Unification: Microsoft Fabric eliminates data silos via OneLake.
