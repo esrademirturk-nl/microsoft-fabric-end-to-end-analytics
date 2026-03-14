@@ -12,7 +12,7 @@ Welcome to my Microsoft Fabric learning repository. This project documents my te
 ### 2. Lakehouse & Delta Lake
 * **Concepts:** Delta Lake Storage, ACID Transactions, and Schema Enforcement.
 * **Hands-on:** Understanding how Delta-Parquet format ensures data reliability.
-* [Explore Folder](./02-Lakehouse-Delta-Tables/)
+* [Explore Folder](/Microsoft_Fabric_Lakehouse/README.md/)
 
 ### 3. Data Integration (Pipelines & Dataflows Gen2)
 * **Tools:** Data Factory Pipelines and Power Query-based Dataflows.
