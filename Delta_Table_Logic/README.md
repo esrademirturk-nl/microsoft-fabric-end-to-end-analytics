@@ -48,6 +48,7 @@ I simulated a live **Internet of Things (IoT)** stream where device status data 
 
 > **📸 Evidence: Streaming Results**
 > ![Streaming Output](/screenshots/Streaming.png)
+> 
 > ![Streaming Output](/screenshots/Streaming_2.png)
 
 ---
