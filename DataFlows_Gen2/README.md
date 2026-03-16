@@ -9,6 +9,7 @@ A hands-on implementation of **Dataflows Gen2** in Microsoft Fabric — connecti
 Before diving into the steps, here is the big picture of what we are building and how all the components connect to each other.
 
 > ![Architecture Diagram](/screenshots/gen2-architecture.png)
+> 
 > *End-to-end architecture: from the HTTP data source through Power Query transformations, into the Lakehouse via a pipeline.*
 
 ### How it all fits together
