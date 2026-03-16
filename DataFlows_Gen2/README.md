@@ -211,17 +211,13 @@ Fabric Workspace/
 
 ## 📸 Screenshots
 
-Create a `screenshots/` folder at the root of this repository and add the following images:
-
 | File | Description |
 |---|---|
 | `screenshots/architecture.png` | Your architecture diagram showing the end-to-end flow |
-| `screenshots/01-empty-workspace.png` | Newly created empty Fabric workspace |
-| `screenshots/02-new-lakehouse.png` | Empty Lakehouse upon creation |
-| `screenshots/03-power-query-custom-column.png` | Power Query editor with MonthNo column and Applied Steps |
-| `screenshots/04-dataflow-diagram-view.png` | Diagram view with Lakehouse destination linked |
-| `screenshots/05-dataflow-pipeline-completed.png` | Completed Dataflow pipeline run |
-| `screenshots/06-orders-table-preview.png` | `orders` table preview in the Lakehouse |
+| `screenshots/gen2-power-query-custom-column.png` | Power Query editor with MonthNo column and Applied Steps |
+| `screenshots/gen2-dataflow-diagram-view.png` | Diagram view with Lakehouse destination linked |
+| `screenshots/gen2-dataflow-pipeline-completed.png` | Completed Dataflow pipeline run |
+| `screenshots/gen2-orders-table-preview.png` | `orders` table preview in the Lakehouse |
 
 ---
 
