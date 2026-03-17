@@ -100,7 +100,7 @@ The Lakehouse plays a specific role here: it is not the final destination for ou
 6. Verify the file appears under `Files/`.
 
 > **Screenshot placeholder**
-> ![CSV Uploaded to Lakehouse](/screenshots/01-csv-uploaded.png)
+> ![CSV Uploaded to Lakehouse](./screenshots/01-csv-uploaded.png)
 > *The sales.csv file visible in the Lakehouse Files section — our raw data has landed.*
 
 ---
@@ -124,7 +124,7 @@ The name "staging" is deliberate. In data warehouse design, a staging table is a
 4. Verify `staging_sales` appears under **Tables** in the Explorer pane.
 
 > **Screenshot placeholder**
-> ![Staging Table Created](/screenshots/02-staging-table.png)
+> ![Staging Table Created](./screenshots/02-staging-table.png)
 > *The staging_sales table created in the Lakehouse — raw data now has structure and types.*
 
 ---
@@ -189,7 +189,7 @@ SELECT * FROM [<your lakehouse name>].[dbo].[staging_sales];
 4. In the Explorer, navigate to **Schemas → Sales → Tables** and verify all three tables are visible. Check **Views** for `Staging_Sales`.
 
 > **Screenshot placeholder**
-> ![Warehouse Schema](/screenshots/03-warehouse-schema.png)
+> ![Warehouse Schema](./screenshots/03-warehouse-schema.png)
 > *The Sales schema in the warehouse Explorer showing Fact_Sales, Dim_Customer, Dim_Item tables and the Staging_Sales view.*
 
 ---
@@ -253,7 +253,7 @@ SELECT COUNT(*) FROM Sales.Fact_Sales
 ```
 
 > **Screenshot placeholder**
-> ![Data Loaded](/screenshots/04-data-loaded.png)
+> ![Data Loaded](./screenshots/04-data-loaded.png)
 > *Row count confirmation showing data has been successfully loaded into Fact_Sales.*
 
 ---
@@ -324,7 +324,7 @@ ORDER BY TotalSales DESC;
 > *Query 2 results — Mountain-200 bike models dominate the top selling products.*
 
 > **Screenshot placeholder**
-> ![Category Top Customer Query](/screenshots/07-category-top-customer.png)
+> ![Category Top Customer Query](./screenshots/07-category-top-customer.png)
 > *Query 3 results — top customer per category using CTE and ROW_NUMBER window function.*
 
 ---
