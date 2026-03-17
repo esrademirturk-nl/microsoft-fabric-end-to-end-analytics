@@ -13,7 +13,7 @@ This lab walks through building a **dimensional data warehouse** in Microsoft Fa
 
 Before diving in, here is the big picture of how all the pieces connect.
 
-> ![Architecture Diagram](/screenshots/architecture.png)
+> ![Architecture Diagram](./screenshots/architecture.png)
 > *End-to-end architecture: CSV → Lakehouse staging → Warehouse fact & dimension tables → Analytical T-SQL queries.*
 
 ### The story of our data
