@@ -8,7 +8,7 @@ A hands-on implementation of **data analysis with Apache Spark** in Microsoft Fa
 
 Before diving into the steps, here is the big picture of what we are building and how all the components connect to each other.
 
-> ![Architecture Diagram](./screenshots/apache-architecture.png)
+> ![Architecture Diagram](/screenshots/apache-architecture.png)
 > *End-to-end architecture: CSV files uploaded to the Lakehouse, read into Spark DataFrames, transformed and saved as Parquet/Delta, then queried and visualized via a Fabric Notebook.*
 
 ### How it all fits together
@@ -111,7 +111,7 @@ Fabric Workspace/
 7. Verify the files appear under `Files/orders/`.
 
 > **Screenshot placeholder**
-> ![CSV Files Uploaded](./screenshots/apache-csv-files-uploaded.png)
+> ![CSV Files Uploaded](/screenshots/apache-csv-files-uploaded.png)
 > *The orders folder containing 2019.csv, 2020.csv and 2021.csv visible in the Lakehouse Explorer.*
 
 ---
@@ -134,7 +134,7 @@ Use this notebook to explore sales order data
 4. Click outside the cell to stop editing.
 
 > **Screenshot placeholder**
-> ![New Notebook](./screenshots/apache-new-notebook.png)
+> ![New Notebook](/screenshots/apache-new-notebook.png)
 > *A new Fabric notebook with a markdown title cell.*
 
 ---
@@ -173,7 +173,7 @@ display(df)
 5. Verify the output shows data with correctly typed columns across all three years.
 
 > **Screenshot placeholder**
-> ![DataFrame with Schema](./screenshots/apache-dataframe-schema.png)
+> ![DataFrame with Schema](/screenshots/apache-dataframe-schema.png)
 > *DataFrame displaying order data with the defined schema — note the correct data types on each column.*
 
 ---
@@ -209,7 +209,7 @@ display(yearlySales)
 ```
 
 > **Screenshot placeholder**
-> ![Data Exploration Results](./screenshots/apache-data-exploration.png)
+> ![Data Exploration Results](/screenshots/apache-data-exploration.png)
 > *Yearly order counts showing aggregated results grouped by year.*
 
 ---
@@ -254,7 +254,7 @@ print("Partitioned data saved!")
 Refresh the Explorer pane to verify the folder structure has been created under `Files/`.
 
 > **Screenshot placeholder**
-> ![Partitioned Data](./screenshots/apache-partitioned-data.png)
+> ![Partitioned Data](/screenshots/apache-partitioned-data.png)
 > *Explorer pane showing the partitioned folder hierarchy: Year=2021/Month=1, etc.*
 
 ---
@@ -284,11 +284,11 @@ ORDER BY OrderYear;
 Refresh the **Tables** section in the Explorer pane to confirm the `salesorders` table is visible.
 
 > **Screenshot placeholder**
-> ![Delta Table Created](./screenshots/apache-delta-table.png)
+> ![Delta Table Created](/screenshots/apache-delta-table.png)
 > *The salesorders Delta table visible in the Lakehouse Explorer Tables section.*
 
 > **Screenshot placeholder**
-> ![SQL Query Results](./screenshots/apache-sql-query-results.png)
+> ![SQL Query Results](/screenshots/apache-sql-query-results.png)
 > *Spark SQL query results showing gross revenue grouped by year.*
 
 ---
@@ -355,11 +355,11 @@ plt.show()
 ```
 
 > **Screenshot placeholder**
-> ![matplotlib Bar Chart](./screenshots/apache-matplotlib-bar-chart.png)
+> ![matplotlib Bar Chart](/screenshots/apache-matplotlib-bar-chart.png)
 > *Revenue by year displayed as a customized bar chart using matplotlib.*
 
 > **Screenshot placeholder**
-> ![seaborn Line Chart](./screenshots/apache-seaborn-line-chart.png)
+> ![seaborn Line Chart](/screenshots/apache-seaborn-line-chart.png)
 > *Yearly revenue trend displayed as a line chart using seaborn.*
 
 ---
@@ -395,8 +395,6 @@ plt.show()
 ---
 
 ## 📸 Screenshots
-
-Create a `screenshots/` folder at the root of this repository and add the following images:
 
 | File | Description |
 |---|---|
