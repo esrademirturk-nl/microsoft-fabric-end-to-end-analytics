@@ -398,7 +398,7 @@ plt.show()
 
 | File | Description |
 |---|---|
-| `screenshots/architecture.png` | Your architecture diagram showing the end-to-end flow |
+| `screenshots/apache-architecture.png` | Your architecture diagram showing the end-to-end flow |
 | `screenshots/apache-csv-files-uploaded.png` | orders folder with CSV files in Lakehouse Explorer |
 | `screenshots/apache-new-notebook.png` | New notebook with markdown title cell |
 | `screenshots/apache-dataframe-schema.png` | DataFrame output with defined schema |
