@@ -73,7 +73,7 @@ Fabric Workspace/
 │   └── Tables/
 │       └── salesorders              # Managed Delta table for SQL queries
 └── Notebooks/
-    └── (your notebook name)         # PySpark analysis notebook
+    └── (Notebook 1)         # PySpark analysis notebook
 ```
 
 ---
