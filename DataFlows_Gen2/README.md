@@ -1,41 +1,42 @@
 # 📊 Dataflows Gen2 in Microsoft Fabric
 
-A hands-on implementation of **Dataflows Gen2** in Microsoft Fabric — connecting to an external CSV source, applying no-code transformations in Power Query Online, and loading the results into a Lakehouse Delta table via a Data Pipeline.
+![Microsoft Fabric](https://img.shields.io/badge/Microsoft%20Fabric-Dataflows%20Gen2-0078D4?style=flat&logo=microsoft&logoColor=white)
+![Power Query](https://img.shields.io/badge/Power%20Query-Online-F2C811?style=flat&logo=powerbi&logoColor=black)
+![Delta Lake](https://img.shields.io/badge/Storage-Delta%20Lake-003366?style=flat)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat)
+
+This lab walks through building a **no-code ETL pipeline** using Dataflows Gen2 in Microsoft Fabric — connecting to an external CSV source, applying transformations in Power Query Online, and loading the results into a Lakehouse Delta table via a Data Pipeline.
 
 ---
 
 ## 🏗️ Architecture
 
-Before diving into the steps, here is the big picture of what we are building and how all the components connect to each other.
+Before diving in, here is the big picture of what we are building.
 
-> ![Architecture Diagram](/screenshots/gen2-architecture.png)
-> 
-> *End-to-end architecture: from the HTTP data source through Power Query transformations, into the Lakehouse via a pipeline.*
+> ![Architecture Diagram](./screenshots/architecture.png)
+> *End-to-end architecture: HTTP source → Power Query transformations → Pipeline orchestration → Lakehouse Delta table.*
 
-### How it all fits together
+### The story of our data
 
-This lab is built around three core Fabric components that work in sequence:
+Not every data transformation needs code. This lab introduces **Dataflows Gen2** — Fabric's answer to the question: *what if analysts could build production-grade ETL pipelines without writing a single line of PySpark or SQL?*
 
-**1 — Dataflow Gen2 (Power Query Online)**
-This is where the actual data work happens. The dataflow connects to an external CSV file over HTTP, applies transformations visually without writing any code, and defines where the output should land. Think of it as the brain of the ETL process.
+Our source data is a CSV file of order records sitting at a public HTTP URL. The goal is to get it into a Lakehouse as a clean, queryable Delta table — enriched with a derived `MonthNo` column that makes month-based filtering trivial for downstream users.
 
-**2 — Lakehouse (OneLake)**
-The destination for our data. The Lakehouse stores everything in Delta format on top of OneLake, giving us ACID transactions, time travel, and the ability to query data with SQL or Spark later. We point the dataflow directly at a Lakehouse table so the data lands there automatically.
+The **Dataflow** is where all the transformation logic lives. It connects to the CSV, applies changes in a visual editor, and writes directly to a Lakehouse table. Every step is recorded as an **Applied Step** — a replayable, auditable history of what was done to the data. No notebooks, no clusters, no code.
 
-**3 — Data Pipeline**
-The dataflow on its own can be run manually, but wrapping it inside a pipeline makes it schedulable, monitorable, and composable with other activities. This is the orchestration layer — it is what makes the whole process production-ready.
+But a dataflow on its own is just a definition. Wrapping it inside a **Pipeline** is what turns it into an operational process — something that can be scheduled, monitored, and chained with other activities. One click to run it, or a schedule to run it automatically — the result is always a fresh `orders` table in the Lakehouse.
 
 ```
 HTTP Source (orders.csv)
         │
         ▼
-  [ Power Query Online ]   ← Transform: add MonthNo column, enforce data types
+  [ Power Query Online ]   ← Add MonthNo, enforce data types
         │
         ▼
-  [ Pipeline: Dataflow Activity ]   ← Orchestrate and schedule the dataflow
+  [ Pipeline: Dataflow Activity ]   ← Orchestrate and schedule
         │
         ▼
-  Lakehouse Delta Table (orders)   ← Query-ready, ACID-compliant storage
+  Lakehouse Delta Table (orders)   ← Query-ready storage
 ```
 
 ---
@@ -52,8 +53,6 @@ No local tooling or SDK installation is required. All steps are performed within
 
 ## 🗂️ What Gets Created
 
-By the end of this lab, your Fabric workspace will contain:
-
 ```
 Fabric Workspace/
 ├── Lakehouse/
@@ -67,42 +66,29 @@ Fabric Workspace/
 
 ---
 
-## 🚀 Step-by-Step Guide
+## 🚀 The Story, Step by Step
 
-### 1. Create a Workspace
+### Chapter 1 — Preparing the Ground: Workspace & Lakehouse
 
-**What:** A Workspace is the top-level container in Microsoft Fabric. Every resource — lakehouses, pipelines, dataflows — lives inside one.
+Every Fabric project begins with a workspace and a place to store data. The workspace is the container that holds everything together. The Lakehouse is where our transformed data will ultimately live — not as a raw file, but as a proper Delta table with types, schema, and ACID guarantees.
 
-**Why:** Before we can create any Fabric resources, we need a workspace with the right capacity assigned. Without Fabric capacity, features like Dataflows Gen2 and Lakehouses are not available.
+Unlike Lab 1 where we needed a staging folder for raw files, the Dataflow writes directly to a Lakehouse table. There is no intermediate CSV to manage — the transformation and the write happen in one step inside the Dataflow editor.
 
 1. Navigate to the [Microsoft Fabric portal](https://app.fabric.microsoft.com/home?experience=fabric) and sign in.
-2. Select **Workspaces** from the left menu bar.
-3. Select **New workspace**, provide a name, and choose a licensing mode that includes Fabric capacity (Trial, Premium, or Fabric).
-4. Confirm creation — the workspace should open empty.
+2. Select **Workspaces** from the left menu bar and create a new workspace with Fabric capacity enabled.
+3. From your workspace, select **Create → Lakehouse** (under Data Engineering).
+4. Give it a unique name and ensure **Lakehouse schemas (Public Preview)** is **disabled**.
 
 ---
 
-### 2. Create a Lakehouse
+### Chapter 2 — Building the Transformation: Dataflow Gen2
 
-**What:** A Lakehouse is a unified analytical store that combines the scalability of a data lake with the query performance of a data warehouse. Data is stored in Delta format on top of OneLake.
+This is the heart of the lab. A Dataflow Gen2 is a Power Query-based ETL component — you define your source, apply transformations visually, and point at a destination. The editor records every change as an **Applied Step**, creating a transparent, replayable audit trail of exactly what was done to the data.
 
-**Why:** We need a destination for our transformed data. Rather than writing to a raw file, we write directly to a structured Delta table inside the Lakehouse — this makes the data immediately queryable with SQL or Spark, and gives us features like ACID transactions and schema enforcement for free.
-
-1. From your workspace, select **Create → Lakehouse** (under Data Engineering).
-2. Give it a unique name and ensure **Lakehouse schemas (Public Preview)** is **disabled**.
-3. Wait for the empty Lakehouse to be created.
-
----
-
-### 3. Create a Dataflow Gen2
-
-**What:** A Dataflow Gen2 is a Power Query-based ETL component. You connect it to a data source, apply transformations using a visual editor, and point it at a destination — all without writing code.
-
-**Why:** Instead of writing PySpark or SQL, Dataflows let us use the familiar Power Query interface to clean and enrich data. This is especially useful for analysts or engineers who want fast, repeatable transformations without managing a Spark cluster. The `MonthNo` column we add here is a good example — extracting the month number from a date field is a common business requirement that would otherwise require code.
+The transformation we apply is simple but meaningful: we extract the month number from the `OrderDate` column using `Date.Month([OrderDate])` and store it as a new `MonthNo` column. This kind of derived attribute — trivial to compute, enormously useful for downstream filtering and aggregation — is exactly what a staging transformation should produce.
 
 1. From the Lakehouse home page, select **Get data → New Dataflow Gen2**.
-2. The **Power Query Online** editor will open.
-3. Select **Import from a Text/CSV file** and configure the connection:
+2. In the **Power Query Online** editor, select **Import from a Text/CSV file** and configure:
 
    | Setting | Value |
    |---|---|
@@ -111,8 +97,8 @@ Fabric Workspace/
    | Data gateway | (none) |
    | Authentication kind | Anonymous |
 
-4. Select **Next** to preview the data, then select **Create**.
-5. On the **Add column** tab, select **Custom column** and add a derived month field:
+3. Select **Next** to preview the data, then select **Create**.
+4. On the **Add column** tab, select **Custom column** and configure:
 
    | Setting | Value |
    |---|---|
@@ -120,68 +106,64 @@ Fabric Workspace/
    | Data type | Whole Number |
    | Formula | `Date.Month([OrderDate])` |
 
-6. Select **OK** and confirm the column appears in the data preview.
-7. Verify the following data types are correctly assigned — incorrect types here will cause errors downstream:
+5. Select **OK** and verify `MonthNo` appears in the data preview.
+6. Confirm the following data types are correctly set — incorrect types will cause write errors:
 
    | Column | Required Type |
    |---|---|
    | `OrderDate` | Date |
    | `MonthNo` | Whole Number |
 
-> **Screenshot placeholder**
-> ![Power Query Editor](/screenshots/gen2-power-query-custom-column.png)
-> *Power Query Online showing the MonthNo custom column formula and the Applied Steps panel on the right, which records every transformation as a replayable step.*
+> ![Power Query Editor](./screenshots/01-power-query-custom-column.png)
+> *Power Query Online showing the MonthNo column and the Applied Steps panel — every transformation is recorded and replayable.*
 
 ---
 
-### 4. Configure the Data Destination
+### Chapter 3 — Choosing Where the Data Lands: Destination
 
-**What:** This step tells the Dataflow where to write its output — in our case, a new table inside the Lakehouse we created earlier.
+A Dataflow without a destination is just a preview. This chapter connects our transformation to the Lakehouse, turning the Dataflow into a complete ETL pipeline that actually writes data somewhere useful.
 
-**Why:** Dataflows are not useful unless their output lands somewhere structured and queryable. By pointing the destination at a Lakehouse table with **Append** mode, we ensure that every time the dataflow runs, new records are added without overwriting existing ones — which is the correct pattern for incremental data ingestion.
+We choose **Append** mode deliberately. In production, a dataflow often runs on a schedule — daily, hourly, or on-demand. Append mode means each run adds new records to the existing table rather than overwriting it, which is the correct pattern for any incremental ingestion scenario.
 
-1. On the **Home** tab of the Power Query editor, select **Add data destination → Lakehouse**.
-2. Sign in with your Power BI organisational account when prompted, then select **Next**.
+1. On the **Home** tab, select **Add data destination → Lakehouse**.
+2. Sign in with your Power BI organisational account, then select **Next**.
 3. Find your workspace, select your Lakehouse, and specify a new table named `orders`.
-4. Select **Next**, then on the **Choose destination settings** page:
+4. On the **Choose destination settings** page:
    - Disable **Use automatic settings**
    - Set the update method to **Append**
    - Select **Save settings**
-5. Open **View → Diagram view** to visually confirm the Lakehouse destination is connected to the query.
-6. Select **Save & run** and wait for the dataflow to finish executing.
+5. Open **View → Diagram view** to confirm the Lakehouse destination icon appears on the query.
+6. Select **Save & run** and wait for the Dataflow to complete.
 
-> **Screenshot placeholder**
-> ![Dataflow Diagram View](/screenshots/gen2-architecture.png)
-> *Diagram view in Power Query Online — the Lakehouse icon on the right confirms the destination is correctly wired up.*
+> ![Dataflow Diagram View](./screenshots/02-dataflow-diagram-view.png)
+> *Diagram view confirming the Lakehouse destination is linked to the query — the full ETL flow is visible in one screen.*
 
 ---
 
-### 5. Add the Dataflow to a Pipeline
+### Chapter 4 — Making It Operational: The Pipeline
 
-**What:** A Data Pipeline wraps the Dataflow inside an orchestration layer, giving us scheduling, monitoring, retry logic, and the ability to chain it with other activities.
+A Dataflow defines what to do with data. A Pipeline defines when and how to do it. By wrapping our Dataflow inside a Pipeline activity, we unlock scheduling, monitoring, retry logic, and the ability to chain the Dataflow with other activities in a larger orchestration workflow.
 
-**Why:** A standalone Dataflow can only be triggered manually or on a simple schedule. By embedding it in a pipeline, we gain full control over the execution context — we can trigger it on a schedule, chain it after other steps, monitor run history, and handle failures gracefully. This is what separates a proof-of-concept from a production-grade data flow.
+This is a small step in terms of configuration — we are simply adding one activity and pointing it at `Dataflow 1` — but it represents a significant step in maturity. A dataflow run from the editor is a manual act. A dataflow run from a pipeline is an operational process.
 
 1. From your workspace, select **+ New item → Data pipeline** and name it `Load Data`.
 2. If the Copy Data wizard opens automatically, close it.
-3. On the **Activities** tab, select **Pipeline activity → Dataflow** to add a Dataflow activity to the canvas.
-4. With the Dataflow activity selected, open the **Settings** tab and configure:
+3. On the **Activities** tab, select **Pipeline activity → Dataflow**.
+4. With the Dataflow activity selected, open the **Settings** tab:
 
    | Property | Value |
    |---|---|
    | Dataflow | `Dataflow 1` |
 
-5. Save the pipeline using the **🖫** icon.
-6. Select **▷ Run** and wait for the pipeline to complete. This may take a few minutes.
-7. Navigate to your Lakehouse, open the **...** menu on **Tables**, select **Refresh**, and confirm the `orders` table has been created and populated.
+5. Save the pipeline using the **🖫** icon and select **▷ Run**.
+6. Wait for the pipeline to complete, then navigate to your Lakehouse.
+7. Open the **...** menu on **Tables**, select **Refresh**, and confirm the `orders` table exists with data.
 
-> **Screenshot placeholder**
-> ![Dataflow Pipeline Completed](/screenshots/gen2-dataflow-pipeline-completed.png)
-> *The pipeline run completed successfully — the green checkmark on the Dataflow activity confirms the data was written to the Lakehouse.*
+> ![Dataflow Pipeline Completed](./screenshots/03-dataflow-pipeline-completed.png)
+> *Pipeline completed — green checkmark confirms the Dataflow ran successfully and data was written to the Lakehouse.*
 
-> **Screenshot placeholder**
-> ![Orders Table Preview](/screenshots/gen2-orders-table-preview.png)
-> *The `orders` Delta table in the Lakehouse Explorer, populated with the transformed data including the new MonthNo column.*
+> ![Orders Table Preview](./screenshots/04-orders-table-preview.png)
+> *The orders Delta table populated with transformed data — note the MonthNo column derived from OrderDate.*
 
 ---
 
@@ -201,7 +183,7 @@ Fabric Workspace/
 | Concept | Description |
 |---|---|
 | **Dataflow Gen2** | A Fabric component using Power Query Online to define ETL logic without writing code |
-| **Power Query Online** | Browser-based transformation tool with a visual, step-by-step editor and 300+ connectors |
+| **Power Query Online** | Browser-based transformation tool with a visual editor and 300+ connectors |
 | **Applied Steps** | The ordered, replayable list of transformations recorded automatically in Power Query |
 | **Lakehouse** | A unified store combining data lake flexibility with warehouse query performance |
 | **Delta Lake** | Open-source table format enabling ACID transactions, versioning, and schema enforcement |
@@ -214,17 +196,15 @@ Fabric Workspace/
 
 | File | Description |
 |---|---|
-| `screenshots/architecture.png` | Your architecture diagram showing the end-to-end flow |
-| `screenshots/gen2-power-query-custom-column.png` | Power Query editor with MonthNo column and Applied Steps |
-| `screenshots/gen2-dataflow-diagram-view.png` | Diagram view with Lakehouse destination linked |
-| `screenshots/gen2-dataflow-pipeline-completed.png` | Completed Dataflow pipeline run |
-| `screenshots/gen2-orders-table-preview.png` | `orders` table preview in the Lakehouse |
+| `screenshots/architecture.png` | End-to-end architecture diagram |
+| `screenshots/01-power-query-custom-column.png` | Power Query editor with MonthNo column and Applied Steps |
+| `screenshots/02-dataflow-diagram-view.png` | Diagram view with Lakehouse destination linked |
+| `screenshots/03-dataflow-pipeline-completed.png` | Completed Dataflow pipeline run |
+| `screenshots/04-orders-table-preview.png` | orders table preview in the Lakehouse |
 
 ---
 
 ## 🧹 Clean Up
-
-To remove all resources after completing the lab:
 
 1. In the left navigation bar, select the icon for your workspace.
 2. Select **Workspace settings → General**.

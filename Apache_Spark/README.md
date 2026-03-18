@@ -1,31 +1,30 @@
 # 🔥 Analyze Data with Apache Spark in Microsoft Fabric
 
-A hands-on implementation of **data analysis with Apache Spark** in Microsoft Fabric — ingesting CSV files into a Lakehouse, transforming and exploring data using PySpark DataFrames, querying with Spark SQL, and visualizing results with matplotlib and seaborn.
+![Microsoft Fabric](https://img.shields.io/badge/Microsoft%20Fabric-Apache%20Spark-0078D4?style=flat&logo=microsoft&logoColor=white)
+![PySpark](https://img.shields.io/badge/PySpark-Data%20Analysis-E25A1C?style=flat&logo=apachespark&logoColor=white)
+![Delta Lake](https://img.shields.io/badge/Storage-Delta%20Lake-003366?style=flat)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat)
+
+This lab walks through analyzing sales data with **Apache Spark** in Microsoft Fabric — uploading CSV files into a Lakehouse, reading and transforming them with PySpark DataFrames, querying with Spark SQL, and visualizing results with matplotlib and seaborn.
 
 ---
 
 ## 🏗️ Architecture
 
-Before diving into the steps, here is the big picture of what we are building and how all the components connect to each other.
+Before diving in, here is the big picture of what we are building.
 
-> ![Architecture Diagram](/screenshots/apache-architecture.png)
-> *End-to-end architecture: CSV files uploaded to the Lakehouse, read into Spark DataFrames, transformed and saved as Parquet/Delta, then queried and visualized via a Fabric Notebook.*
+> ![Architecture Diagram](./screenshots/architecture.png)
+> *End-to-end architecture: CSV files → Lakehouse → PySpark Notebook → Parquet/Delta → Spark SQL → Charts.*
 
-### How it all fits together
+### The story of our data
 
-This lab is built around four core components that work in sequence:
+Previous labs moved data through pipelines and dataflows. This lab is different — here, we roll up our sleeves and work with the data directly using code.
 
-**1 — Lakehouse (OneLake)**
-The central storage layer. We upload raw CSV files here and later write transformed data back as Parquet and Delta tables. Everything lives in OneLake, making it accessible to Spark, SQL, and Power BI without moving data.
+Three years of raw sales records arrive as CSV files: `2019.csv`, `2020.csv`, and `2021.csv`. They are untyped, unstructured, and not queryable. Our job is to turn them into something an analyst can actually use — a clean Delta table with proper column types, derived attributes, and the ability to answer business questions with SQL.
 
-**2 — Fabric Notebook (PySpark)**
-The interactive workspace where all the data work happens. We use PySpark — Python optimized for Spark — to read files, define schemas, apply transformations, and run queries. The notebook is attached to the Lakehouse so it can read and write data directly.
+The tool we use is **Apache Spark**, accessed through a **Fabric Notebook** running PySpark. Spark is a distributed compute engine — it can process data at a scale that would overwhelm a single machine. But even on a small dataset like ours, it teaches the patterns that matter: defining schemas explicitly, chaining DataFrame transformations, writing to columnar formats, and querying with SQL.
 
-**3 — Spark SQL & Delta Tables**
-Once data is transformed, we register it as a managed Delta table. This gives us the ability to query it with standard SQL using the `%%sql` magic in the notebook — bridging the gap between a data lake and a relational warehouse.
-
-**4 — Visualizations (matplotlib & seaborn)**
-The final step is turning query results into charts. We use matplotlib for fine-grained control and seaborn for a cleaner, theme-based approach — both running directly inside the notebook.
+The journey has four acts. First, we **read** the CSVs into a typed DataFrame — the foundation everything else builds on. Then we **explore** the data using DataFrame methods, asking basic business questions without writing SQL. Next, we **transform** it — adding derived columns, splitting fields, reordering — and save the result as both partitioned Parquet files and a managed Delta table. Finally, we **visualize** the results using matplotlib and seaborn, turning query results into charts that reveal trends at a glance.
 
 ```
 Local CSV Files (orders.zip)
@@ -35,16 +34,16 @@ Local CSV Files (orders.zip)
         │
         ▼
   [ PySpark Notebook ]      ← Read, explore, transform DataFrames
-        │         │
-        ▼         ▼
-  [ Parquet /  [ Delta Table ]   ← Save transformed & partitioned data
-  Partitioned ]  (salesorders)
-                  │
-                  ▼
-          [ Spark SQL Queries ]   ← Query with %%sql magic
-                  │
-                  ▼
-        [ matplotlib / seaborn ]  ← Visualize results as charts
+        │              │
+        ▼              ▼
+  [ Parquet /     [ Delta Table ]   ← Save transformed data
+  Partitioned ]   (salesorders)
+                       │
+                       ▼
+               [ Spark SQL ]        ← Query with %%sql magic
+                       │
+                       ▼
+             [ matplotlib / seaborn ] ← Visualize results
 ```
 
 ---
@@ -61,93 +60,59 @@ No local tooling or SDK installation is required. All steps are performed within
 
 ## 🗂️ What Gets Created
 
-By the end of this lab, your Fabric workspace will contain:
-
 ```
 Fabric Workspace/
 ├── Lakehouse/
 │   ├── Files/
 │   │   ├── orders/                  # Uploaded raw CSV files (2019–2021)
-│   │   ├── transformed_data/orders/ # Parquet output of transformed DataFrame
+│   │   ├── transformed_data/orders/ # Parquet output
 │   │   └── partitioned_data/        # Data partitioned by Year and Month
 │   └── Tables/
-│       └── salesorders              # Managed Delta table for SQL queries
+│       └── salesorders              # Managed Delta table
 └── Notebooks/
-    └── (Notebook 1)         # PySpark analysis notebook
+    └── Sales Order Analysis         # PySpark analysis notebook
 ```
 
 ---
 
-## 🚀 Step-by-Step Guide
+## 🚀 The Story, Step by Step
 
-### 1. Create a Workspace
+### Chapter 1 — Gathering the Raw Material: Workspace, Lakehouse & Files
 
-**What:** A Workspace is the top-level container in Microsoft Fabric. Every resource — lakehouses, notebooks, pipelines — lives inside one.
+Before any analysis can happen, data needs a home. We create a Lakehouse and upload three years of CSV files into it. This is the simplest possible ingestion — no pipeline, no dataflow, just files dropped into a folder. It is enough to get started, and it mirrors a common real-world scenario: a data engineer hands you a set of raw files and asks you to make sense of them.
 
-**Why:** Fabric features like Spark notebooks and Lakehouses require a workspace with Fabric capacity assigned. Without it, these capabilities are not available.
+The Lakehouse's `Files` section is not just for temporary storage — Spark can read directly from it using a simple path like `Files/orders/*.csv`. The wildcard `*` means Spark reads all three files in a single operation, treating them as one logical dataset spanning all three years.
 
 1. Navigate to the [Microsoft Fabric portal](https://app.fabric.microsoft.com/home?experience=fabric-developer) and sign in.
-2. Select **Workspaces** from the left menu bar.
-3. Select **New workspace**, provide a name, and choose a licensing mode that includes Fabric capacity (Trial, Premium, or Fabric).
-4. Confirm creation — the workspace should open empty.
+2. Select **Workspaces** from the left menu bar and create a new workspace with Fabric capacity enabled.
+3. From your workspace, select **New Item → Lakehouse** and give it a unique name. Ensure **Lakehouse schemas (Public Preview)** is **disabled**.
+4. Download the data: `https://github.com/MicrosoftLearning/dp-data/raw/main/orders.zip`
+5. Extract the archive — you should have `2019.csv`, `2020.csv`, and `2021.csv` inside an `orders` folder.
+6. In the Lakehouse Explorer, select **... → Upload → Upload folder** next to Files and upload the `orders` folder.
+7. Verify the three files appear under `Files/orders/`.
+
+> ![CSV Files Uploaded](./screenshots/01-csv-files-uploaded.png)
+> *The orders folder with all three CSV files visible in the Lakehouse Explorer.*
 
 ---
 
-### 2. Create a Lakehouse and Upload Files
+### Chapter 2 — Reading the Data Properly: DataFrame & Schema
 
-**What:** A Lakehouse is the unified storage layer of our solution. We upload raw CSV order files here so Spark can read them directly.
+Reading a CSV with Spark is easy. Reading it correctly is the important part.
 
-**Why:** Rather than connecting to an external database or HTTP source, we place the files inside the Lakehouse's `Files` section. This means Spark can access them via a simple file path (`Files/orders/*.csv`) without any additional connectors or credentials — keeping the setup simple and the data co-located with our compute.
+By default, Spark infers column types from the data — a process that is convenient but dangerous. An `OrderDate` inferred as a string cannot be used in date calculations. A `Quantity` inferred as a float will produce unexpected results in integer arithmetic. Silently wrong types are worse than explicit errors.
 
-1. From your workspace, select **New Item → Lakehouse** (under Store data).
-2. Give it a unique name and ensure **Lakehouse schemas (Public Preview)** is **disabled**.
+We solve this by defining a **schema** — an explicit declaration of every column name and its type. This is not extra work; it is good engineering practice. The schema acts as a contract between the raw data and everything downstream.
 
-   > ⚠️ This setting cannot be changed after creation. If you miss this step, you will need to create a new Lakehouse.
-
-3. Download the data files from: `https://github.com/MicrosoftLearning/dp-data/raw/main/orders.zip`
-4. Extract the archive — you should have a folder named `orders` containing three files: `2019.csv`, `2020.csv`, and `2021.csv`.
-5. In the Lakehouse Explorer pane, select the **...** menu next to **Files** and choose **Upload → Upload folder**.
-6. Navigate to the extracted `orders` folder and upload it.
-7. Verify the files appear under `Files/orders/`.
-
-> **Screenshot placeholder**
-> ![CSV Files Uploaded](/screenshots/apache-csv-files-uploaded.png)
-> *The orders folder containing 2019.csv, 2020.csv and 2021.csv visible in the Lakehouse Explorer.*
-
----
-
-### 3. Create a Notebook
-
-**What:** A Fabric Notebook is an interactive environment where we write and run PySpark code, add markdown explanations, and view results inline.
-
-**Why:** Notebooks are the standard tool for exploratory data analysis in Spark environments. They allow us to iterate quickly — running one cell at a time, inspecting results, and refining our code — without needing to deploy a full application.
-
-1. From the left menu bar, select **... → Create → Notebook** (under Data Engineering).
-2. Click the notebook name above the Home tab and rename it to something descriptive (e.g., `Sales Order Analysis`).
-3. Select the first cell, click the **M↓** button in the top-right toolbar to convert it to a **markdown cell**, and add a title:
+1. From the Lakehouse, select **Open notebook → New notebook** and rename it to `Sales Order Analysis`.
+2. Convert the first cell to **markdown** using the **M↓** button and add:
 
 ```markdown
 # Sales order data exploration
 Use this notebook to explore sales order data
 ```
 
-4. Click outside the cell to stop editing.
-
-> **Screenshot placeholder**
-> ![New Notebook](/screenshots/apache-new-notebook.png)
-> *A new Fabric notebook with a markdown title cell.*
-
----
-
-### 4. Create a DataFrame
-
-**What:** A DataFrame is Spark's core data structure — a distributed table of rows and columns. We use it to load the CSV files and work with the data programmatically.
-
-**Why:** Loading data into a DataFrame gives us access to Spark's entire transformation and analysis API. We define a schema explicitly rather than relying on auto-detection — this ensures correct data types (especially for dates and numbers) and avoids silent type errors that would cause problems in downstream steps.
-
-1. From the Lakehouse Explorer, attach your Lakehouse to the notebook: select **Open notebook → Existing notebook** and open your notebook. Expand **Files → orders** in the Explorer pane.
-2. From the **...** menu for `2019.csv`, select **Load data → Spark** to auto-generate a code cell.
-3. Replace the generated code with the following to define a proper schema and load all three years at once:
+3. Add a code cell with the schema definition and data load:
 
 ```python
 from pyspark.sql.types import *
@@ -165,28 +130,24 @@ orderSchema = StructType([
 ])
 
 df = spark.read.format("csv").schema(orderSchema).load("Files/orders/*.csv")
-
 display(df)
 ```
 
-4. Run the cell with **▷ Run cell**. The first run may take a minute as the Spark session starts.
-5. Verify the output shows data with correctly typed columns across all three years.
+4. Select **▷ Run cell**. The first run takes a minute as the Spark pool starts.
+5. Verify the output shows correctly typed columns across all three years.
 
-> **Screenshot placeholder**
-> ![DataFrame with Schema](/screenshots/apache-dataframe-schema.png)
-> *DataFrame displaying order data with the defined schema — note the correct data types on each column.*
+> ![DataFrame with Schema](./screenshots/02-dataframe-schema.png)
+> *DataFrame displaying order data with the defined schema — correct types on every column.*
 
 ---
 
-### 5. Explore the Data
+### Chapter 3 — Asking Business Questions: Data Exploration
 
-**What:** This step uses DataFrame methods to filter, count, group, and aggregate data — answering basic business questions without writing SQL.
+With a properly typed DataFrame, we can start answering real questions — without writing SQL. Spark's DataFrame API is expressive enough to handle filtering, grouping, counting, and aggregating in just a few lines of code.
 
-**Why:** Before transforming or saving data, it is good practice to understand its shape and content. DataFrame operations like `select`, `where`, `groupBy`, and `count` let us quickly validate data quality, spot anomalies, and confirm our schema is correct — all within the same notebook.
+The exploration reveals three things: which customers bought a specific product, how much of each product was sold, and how many orders were placed each year. These are the questions any analyst would ask first — and the fact that we can answer them with code rather than SQL queries shows how versatile the DataFrame API is.
 
-Add the following code cells one by one, running each to observe the results:
-
-**Filter customers who bought a specific product:**
+**Filter: customers who bought a specific product**
 ```python
 customers = df.select("CustomerName", "Email").where(df['Item'] == 'Road-250 Red, 52')
 print(customers.count())
@@ -194,13 +155,13 @@ print(customers.distinct().count())
 display(customers.distinct())
 ```
 
-**Total quantity sold per product:**
+**Aggregate: total quantity sold per product**
 ```python
 productSales = df.select("Item", "Quantity").groupBy("Item").sum()
 display(productSales)
 ```
 
-**Number of orders per year:**
+**Group: number of orders per year**
 ```python
 from pyspark.sql.functions import *
 
@@ -208,23 +169,21 @@ yearlySales = df.select(year(col("OrderDate")).alias("Year")).groupBy("Year").co
 display(yearlySales)
 ```
 
-> **Screenshot placeholder**
-> ![Data Exploration Results](/screenshots/apache-data-exploration.png)
-> *Yearly order counts showing aggregated results grouped by year.*
+> ![Data Exploration](./screenshots/03-data-exploration.png)
+> *Yearly order counts — the groupBy result showing aggregated sales per year.*
 
 ---
 
-### 6. Transform and Save the Data
+### Chapter 4 — Enriching the Data: Transformations & Saving
 
-**What:** We apply a series of transformations to enrich the DataFrame — adding derived columns and reordering fields — then save the result in Parquet format, both as a flat file and as partitioned data.
+Raw data rarely arrives in the shape analysts need. Dates need to be decomposed into year and month for time-series analysis. Customer names stored as a single string need to be split for proper sorting and filtering. Irrelevant columns need to be dropped.
 
-**Why:** Raw CSV files are not ideal for large-scale analytics. Parquet is a columnar format that compresses data efficiently and enables predicate pushdown — meaning Spark only reads the columns and partitions it actually needs, dramatically improving query performance. Partitioning by Year and Month means that a query filtering for a single month only reads that month's file, not the entire dataset.
+We apply all of these transformations in one notebook cell, then save the result in two formats. **Parquet** is a columnar file format — smaller than CSV, faster to read, and supported by every major analytics tool. We also partition the Parquet output by Year and Month, which means a query filtering for a single month only reads that month's file rather than the entire dataset.
 
-**Apply transformations:**
 ```python
 from pyspark.sql.functions import *
 
-# Add Year, Month, FirstName, LastName columns
+# Derive Year, Month, FirstName, LastName
 transformed_df = df.withColumn("Year", year(col("OrderDate"))) \
                    .withColumn("Month", month(col("OrderDate"))) \
                    .withColumn("FirstName", split(col("CustomerName"), " ").getItem(0)) \
@@ -239,39 +198,38 @@ transformed_df = transformed_df[
 display(transformed_df.limit(5))
 ```
 
-**Save as Parquet:**
+**Save as flat Parquet:**
 ```python
 transformed_df.write.mode("overwrite").parquet('Files/transformed_data/orders')
-print("Transformed data saved!")
+print("Saved!")
 ```
 
-**Save as partitioned Parquet (by Year and Month):**
+**Save as partitioned Parquet:**
 ```python
 transformed_df.write.partitionBy("Year", "Month").mode("overwrite").parquet("Files/partitioned_data")
-print("Partitioned data saved!")
+print("Partitioned!")
 ```
 
-Refresh the Explorer pane to verify the folder structure has been created under `Files/`.
+Refresh the Explorer pane to verify the folder hierarchy: `partitioned_data/Year=2021/Month=1/` etc.
 
-> **Screenshot placeholder**
-> ![Partitioned Data](/screenshots/apache-partitioned-data.png)
-> *Explorer pane showing the partitioned folder hierarchy: Year=2021/Month=1, etc.*
+> ![Partitioned Data](./screenshots/04-partitioned-data.png)
+> *Explorer showing the Year/Month partition hierarchy — Spark only reads the relevant partition when filtering by date.*
 
 ---
 
-### 7. Work with Tables and SQL
+### Chapter 5 — Bridging Code and SQL: Delta Tables
 
-**What:** We register the DataFrame as a managed Delta table in Spark's metastore, then query it using standard SQL with the `%%sql` notebook magic.
+Not everyone speaks PySpark. Registering our transformed data as a managed **Delta table** means analysts, BI tools, and SQL users can query the same data without touching a single line of Python.
 
-**Why:** Not everyone is comfortable writing PySpark. Registering data as a Delta table means analysts can query it with familiar SQL syntax, BI tools like Power BI can connect to it directly, and we get all the benefits of Delta format — ACID transactions, schema enforcement, and time travel — for free.
+Delta format adds something important on top of Parquet: ACID transactions, schema enforcement, and time travel. The table is versioned — every write is logged, and you can query the state of the data at any point in the past. This is the format Fabric recommends for all analytical tables, and it is why we use it here.
 
-**Create a Delta table:**
 ```python
 df.write.format("delta").saveAsTable("salesorders")
 spark.sql("DESCRIBE EXTENDED salesorders").show(truncate=False)
 ```
 
-**Query with Spark SQL:**
+Now query it with pure SQL using the `%%sql` magic — no Python required:
+
 ```sql
 %%sql
 SELECT YEAR(OrderDate) AS OrderYear,
@@ -281,39 +239,29 @@ GROUP BY YEAR(OrderDate)
 ORDER BY OrderYear;
 ```
 
-Refresh the **Tables** section in the Explorer pane to confirm the `salesorders` table is visible.
+Refresh **Tables** in the Explorer to confirm `salesorders` is visible.
 
-> **Screenshot placeholder**
-> ![Delta Table Created](/screenshots/apache-delta-table.png)
-> *The salesorders Delta table visible in the Lakehouse Explorer Tables section.*
+> ![Delta Table](./screenshots/05-delta-table.png)
+> *The salesorders Delta table in the Lakehouse Explorer — now queryable with SQL, Spark, and Power BI.*
 
-> **Screenshot placeholder**
-> ![SQL Query Results](/screenshots/apache-sql-query-results.png)
-> *Spark SQL query results showing gross revenue grouped by year.*
+> ![SQL Query Results](./screenshots/06-sql-query-results.png)
+> *Spark SQL results showing gross revenue grouped by year.*
 
 ---
 
-### 8. Visualize Data
+### Chapter 6 — Telling the Story: Visualizations
 
-**What:** We use Python's matplotlib and seaborn libraries to create charts directly inside the notebook from Spark SQL query results.
-
-**Why:** Tables of numbers are hard to interpret at a glance. Charts reveal trends, comparisons, and anomalies instantly. Running visualizations inside the notebook means there is no need to export data to a separate BI tool for basic analysis — the full story from raw data to insight lives in one place.
-
-**Prepare the data:**
-```python
-sqlQuery = "SELECT CAST(YEAR(OrderDate) AS CHAR(4)) AS OrderYear, \
-                SUM((UnitPrice * Quantity) + Tax) AS GrossRevenue, \
-                COUNT(DISTINCT SalesOrderNumber) AS YearlyCounts \
-            FROM salesorders \
-            GROUP BY CAST(YEAR(OrderDate) AS CHAR(4)) \
-            ORDER BY OrderYear"
-df_spark = spark.sql(sqlQuery)
-df_sales = df_spark.toPandas()  # matplotlib requires a Pandas DataFrame
-```
+Numbers in a table are hard to interpret. Charts make trends, comparisons, and anomalies immediately obvious. We use two libraries — **matplotlib** for fine-grained control and **seaborn** for a cleaner, theme-based approach — both running directly inside the notebook.
 
 **Bar chart with matplotlib:**
 ```python
 from matplotlib import pyplot as plt
+
+sqlQuery = "SELECT CAST(YEAR(OrderDate) AS CHAR(4)) AS OrderYear, \
+                SUM((UnitPrice * Quantity) + Tax) AS GrossRevenue \
+            FROM salesorders GROUP BY CAST(YEAR(OrderDate) AS CHAR(4)) ORDER BY OrderYear"
+df_spark = spark.sql(sqlQuery)
+df_sales = df_spark.toPandas()
 
 plt.clf()
 fig = plt.figure(figsize=(8, 3))
@@ -322,25 +270,6 @@ plt.title('Revenue by Year')
 plt.xlabel('Year')
 plt.ylabel('Revenue')
 plt.grid(color='#95a5a6', linestyle='--', linewidth=2, axis='y', alpha=0.7)
-plt.xticks(rotation=45)
-plt.show()
-```
-
-**Side-by-side subplots (bar + pie):**
-```python
-from matplotlib import pyplot as plt
-
-plt.clf()
-fig, ax = plt.subplots(1, 2, figsize=(10, 4))
-
-ax[0].bar(x=df_sales['OrderYear'], height=df_sales['GrossRevenue'], color='orange')
-ax[0].set_title('Revenue by Year')
-
-ax[1].pie(df_sales['YearlyCounts'])
-ax[1].set_title('Orders per Year')
-ax[1].legend(df_sales['OrderYear'])
-
-fig.suptitle('Sales Data')
 plt.show()
 ```
 
@@ -354,13 +283,11 @@ ax = sns.lineplot(x="OrderYear", y="GrossRevenue", data=df_sales)
 plt.show()
 ```
 
-> **Screenshot placeholder**
-> ![matplotlib Bar Chart](/screenshots/apache-matplotlib-bar-chart.png)
-> *Revenue by year displayed as a customized bar chart using matplotlib.*
+> ![matplotlib Bar Chart](./screenshots/07-matplotlib-bar-chart.png)
+> *Revenue by year as a bar chart — the orange bars make year-over-year comparison immediate.*
 
-> **Screenshot placeholder**
-> ![seaborn Line Chart](/screenshots/apache-seaborn-line-chart.png)
-> *Yearly revenue trend displayed as a line chart using seaborn.*
+> ![seaborn Line Chart](./screenshots/08-seaborn-line-chart.png)
+> *The same revenue data as a seaborn line chart — the trend is clearer with a continuous line.*
 
 ---
 
@@ -368,13 +295,13 @@ plt.show()
 
 | Transformation | Input | Output | Why |
 |---|---|---|---|
-| Define schema | Raw CSV (no types) | Typed DataFrame | Prevents silent type errors |
+| Define schema | Raw CSV | Typed DataFrame | Prevents silent type errors |
 | Add `Year` column | `OrderDate` | `Year` (Integer) | Enables year-based grouping |
 | Add `Month` column | `OrderDate` | `Month` (Integer) | Enables month-based partitioning |
 | Split customer name | `CustomerName` | `FirstName`, `LastName` | Normalises name data |
 | Save as Parquet | DataFrame | `Files/transformed_data/` | Efficient columnar storage |
 | Partition by Year/Month | DataFrame | `Files/partitioned_data/` | Improves query performance |
-| Register Delta table | DataFrame | `salesorders` table | Enables SQL access |
+| Register Delta table | DataFrame | `salesorders` table | Enables SQL and BI access |
 
 ---
 
@@ -386,11 +313,11 @@ plt.show()
 | **DataFrame** | Spark's distributed table structure for reading, transforming, and writing data |
 | **Schema** | An explicit definition of column names and data types applied when reading files |
 | **Parquet** | A columnar file format optimised for analytical queries — faster and smaller than CSV |
-| **Partitioning** | Splitting data into subfolders by column value so Spark only reads relevant files |
-| **Delta Lake** | Open-source table format adding ACID transactions and versioning over Parquet files |
+| **Partitioning** | Splitting data into subfolders by column value so Spark only reads relevant partitions |
+| **Delta Lake** | Open-source table format adding ACID transactions and versioning over Parquet |
 | **Spark SQL** | SQL interface for querying Delta tables directly inside a notebook via `%%sql` |
 | **matplotlib** | Core Python plotting library for fully customisable chart creation |
-| **seaborn** | Higher-level plotting library built on matplotlib with built-in themes and simpler syntax |
+| **seaborn** | Higher-level plotting library built on matplotlib with built-in themes |
 
 ---
 
@@ -398,27 +325,23 @@ plt.show()
 
 | File | Description |
 |---|---|
-| `screenshots/apache-architecture.png` | Your architecture diagram showing the end-to-end flow |
-| `screenshots/apache-csv-files-uploaded.png` | orders folder with CSV files in Lakehouse Explorer |
-| `screenshots/apache-new-notebook.png` | New notebook with markdown title cell |
-| `screenshots/apache-dataframe-schema.png` | DataFrame output with defined schema |
-| `screenshots/apache-data-exploration.png` | Aggregation / groupBy results |
-| `screenshots/apache-partitioned-data.png` | Partitioned folder hierarchy in Explorer |
-| `screenshots/apache-delta-table.png` | salesorders table in Lakehouse Explorer |
-| `screenshots/apache-sql-query-results.png` | Spark SQL revenue query results |
-| `screenshots/apache-matplotlib-bar-chart.png` | Revenue bar chart from matplotlib |
-| `screenshots/apache-seaborn-line-chart.png` | Revenue line chart from seaborn |
+| `screenshots/architecture.png` | End-to-end architecture diagram |
+| `screenshots/01-csv-files-uploaded.png` | orders folder with CSV files in Lakehouse Explorer |
+| `screenshots/02-dataframe-schema.png` | DataFrame output with defined schema |
+| `screenshots/03-data-exploration.png` | Aggregation / groupBy results |
+| `screenshots/04-partitioned-data.png` | Partitioned folder hierarchy in Explorer |
+| `screenshots/05-delta-table.png` | salesorders table in Lakehouse Explorer |
+| `screenshots/06-sql-query-results.png` | Spark SQL revenue query results |
+| `screenshots/07-matplotlib-bar-chart.png` | Revenue bar chart from matplotlib |
+| `screenshots/08-seaborn-line-chart.png` | Revenue line chart from seaborn |
 
 ---
 
 ## 🧹 Clean Up
 
-To remove all resources after completing the lab:
-
 1. On the notebook menu, select **Stop session** to end the Spark session.
 2. In the left navigation bar, select the icon for your workspace.
-3. Select **Workspace settings → General**.
-4. Scroll down and select **Remove this workspace → Delete**.
+3. Select **Workspace settings → General → Remove this workspace → Delete**.
 
 ---
 
