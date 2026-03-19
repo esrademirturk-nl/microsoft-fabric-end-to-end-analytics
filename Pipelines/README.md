@@ -248,11 +248,11 @@ This pattern — delete staging → copy fresh → transform — is the backbone
 | File | Description |
 |---|---|
 | `screenshots/architecture.png` | End-to-end architecture diagram |
-| `screenshots/copy-data.png` | Copy Data activity after successful first run |
-| `screenshots/showing-file.png` | sales.csv in Lakehouse Files/new_data |
-| `screenshots/notebook-load-modify-data.png` | Notebook with parameter and transformation cells |
-| `screenshots/delete-copy-load-data.png` | Final pipeline with all three activities |
-| `screenshots/showing-table.png` | new_sales Delta table in Lakehouse Explorer |
+| `screenshots/01-copy_data.png` | Copy Data activity after successful first run |
+| `screenshots/02-showing_file.png` | sales.csv in Lakehouse Files/new_data |
+| `screenshots/03-notebook-load_modify_data.png` | Notebook with parameter and transformation cells |
+| `screenshots/04-delete_copy_load_data.png` | Final pipeline with all three activities |
+| `screenshots/05-showing_table.png` | new_sales Delta table in Lakehouse Explorer |
 
 ---
 
