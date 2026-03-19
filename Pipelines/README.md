@@ -118,10 +118,10 @@ The Copy Data wizard handles all the HTTP configuration — URL, authentication,
 5. Select **Save + Run** and wait for a `Succeeded` status in the Output pane.
 6. Navigate back to the Lakehouse and verify `sales.csv` appears under `Files/new_data/`.
 
-> ![Copy Data Pipeline](./screenshots/01-copy-data.png)
+> ![Copy Data Pipeline](./screenshots/01-copy_data.png)
 > *Pipeline designer showing the Copy Data activity after successful execution.*
 
-> ![File in Lakehouse](./screenshots/02-showing-file.png)
+> ![File in Lakehouse](./screenshots/02-showing_file.png)
 > *sales.csv visible in the Lakehouse Files/new_data staging folder.*
 
 ---
@@ -166,7 +166,7 @@ df.write.format("delta").mode("append").saveAsTable(table_name)
 4. Select **Run all**. The first run may take a minute as the Spark pool initialises.
 5. In the Explorer pane, refresh **Tables** and verify the `sales` table has been created.
 
-> ![Notebook](./screenshots/03-notebook-load-modify-data.png)
+> ![Notebook](./screenshots/03-notebook-load_modify_data.png)
 > *Notebook with the parameter cell and transformation code — note the parameter cell indicator.*
 
 ---
@@ -210,10 +210,10 @@ This pattern — delete staging → copy fresh → transform — is the backbone
 9. Save the pipeline and select **▷ Run**. Wait for all three activities to complete successfully.
 10. Navigate to your Lakehouse, expand **Tables**, and confirm the `new_sales` table is present.
 
-> ![Full Pipeline](./screenshots/04-delete-copy-load-data.png)
+> ![Full Pipeline](./screenshots/04-delete_copy_load_data.png)
 > *Complete pipeline — Delete, Copy Data, and Notebook activities connected in sequence.*
 
-> ![new_sales Table](./screenshots/05-showing-table.png)
+> ![new_sales Table](./screenshots/05-showing_table.png)
 > *The new_sales Delta table in the Lakehouse Explorer, created by the notebook when run by the pipeline.*
 
 ---
