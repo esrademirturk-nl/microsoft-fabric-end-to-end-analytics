@@ -44,56 +44,29 @@ The labs follow the official **Microsoft Fabric curriculum** sequence, building 
 
 | # | Folder | Topic | Key Technologies |
 |---|---|---|---|
-| 01 | `01-Microsoft_Fabric_Lakehouse` | Create a Lakehouse, upload files, load Delta tables, SQL & visual queries | OneLake · Delta Lake · SQL Analytics Endpoint |
-| 02 | `02-Pipelines` | ELT pipeline with Copy Data, PySpark notebook, parameter cells | Data Factory · PySpark · Delta Lake |
-| 03 | `03-DataFlows_Gen2` | No-code ETL with Power Query Online, Lakehouse destination, pipeline orchestration | Dataflows Gen2 · Power Query · Delta Lake |
-| 04 | `04-Apache_Spark` | DataFrames, schema definition, Parquet partitioning, Spark SQL, matplotlib, seaborn | PySpark · Spark SQL · matplotlib · seaborn |
-| 05 | `05-Delta_Table_Logic` | Schema enforcement, managed vs external tables, time travel, structured streaming | Delta Lake · Spark Streaming · Checkpoint |
-| 06 | `06-T-SQL_Data_Warehouse` | Star schema, stored procedures, cross-database views, analytical T-SQL queries | T-SQL · Star Schema · Stored Procedures |
-| 07 | `07-Monitor_Data_Warehouse` | DMVs, live query monitoring, Query Insights, historical performance analysis | DMVs · sys schema · queryinsights |
-| 08 | `08-Secure_Data_Warehouse` | Dynamic Data Masking, Row-Level Security, Column-Level Security, GRANT/DENY | DDM · RLS · CLS · T-SQL DCL |
+| 01 | [01-Microsoft_Fabric_Lakehouse](./01-Microsoft_Fabric_Lakehouse/README.md) | Create a Lakehouse, upload files, load Delta tables, SQL & visual queries | OneLake · Delta Lake · SQL Analytics Endpoint |
+| 02 | [02-Pipelines](./02-Pipelines/README.md) | ELT pipeline with Copy Data, PySpark notebook, parameter cells | Data Factory · PySpark · Delta Lake |
+| 03 | [03-DataFlows_Gen2](./03-DataFlows_Gen2/README.md) | No-code ETL with Power Query Online, Lakehouse destination, pipeline orchestration | Dataflows Gen2 · Power Query · Delta Lake |
+| 04 | [04-Apache_Spark](./04-Apache_Spark/README.md) | DataFrames, schema definition, Parquet partitioning, Spark SQL, matplotlib, seaborn | PySpark · Spark SQL · matplotlib · seaborn |
+| 05 | [05-Delta_Table_Logic](./05-Delta_Table_Logic/README.md) | Schema enforcement, managed vs external tables, time travel, structured streaming | Delta Lake · Spark Streaming · Checkpoint |
+| 06 | [06-T-SQL_Data_Warehouse](./06-T-SQL_Data_Warehouse/README.md) | Star schema, stored procedures, cross-database views, analytical T-SQL queries | T-SQL · Star Schema · Stored Procedures |
+| 07 | [07-Monitor_Data_Warehouse](./07-Monitor_Data_Warehouse/README.md) | DMVs, live query monitoring, Query Insights, historical performance analysis | DMVs · sys schema · queryinsights |
+| 08 | [08-Secure_Data_Warehouse](./08-Secure_Data_Warehouse/README.md) | Dynamic Data Masking, Row-Level Security, Column-Level Security, GRANT/DENY | DDM · RLS · CLS · T-SQL DCL |
 
 ---
 
 ## 🗂️ Repository Structure
 
-```
-microsoft-fabric-end-to-end-analytics/
-│
-├── README.md                              ← You are here
-│
-├── 01-Microsoft_Fabric_Lakehouse/
-│   ├── README.md
-│   └── screenshots/
-│
-├── 02-Pipelines/
-│   ├── README.md
-│   └── screenshots/
-│
-├── 03-DataFlows_Gen2/
-│   ├── README.md
-│   └── screenshots/
-│
-├── 04-Apache_Spark/
-│   ├── README.md
-│   └── screenshots/
-│
-├── 05-Delta_Table_Logic/
-│   ├── README.md
-│   └── screenshots/
-│
-├── 06-T-SQL_Data_Warehouse/
-│   ├── README.md
-│   └── screenshots/
-│
-├── 07-Monitor_Data_Warehouse/
-│   ├── README.md
-│   └── screenshots/
-│
-└── 08-Secure_Data_Warehouse/
-    ├── README.md
-    └── screenshots/
-```
+| Folder | README |
+|---|---|
+| `01-Microsoft_Fabric_Lakehouse/` | [→ README](./01-Microsoft_Fabric_Lakehouse/README.md) |
+| `02-Pipelines/` | [→ README](./02-Pipelines/README.md) |
+| `03-DataFlows_Gen2/` | [→ README](./03-DataFlows_Gen2/README.md) |
+| `04-Apache_Spark/` | [→ README](./04-Apache_Spark/README.md) |
+| `05-Delta_Table_Logic/` | [→ README](./05-Delta_Table_Logic/README.md) |
+| `06-T-SQL_Data_Warehouse/` | [→ README](./06-T-SQL_Data_Warehouse/README.md) |
+| `07-Monitor_Data_Warehouse/` | [→ README](./07-Monitor_Data_Warehouse/README.md) |
+| `08-Secure_Data_Warehouse/` | [→ README](./08-Secure_Data_Warehouse/README.md) |
 
 ---
 
