@@ -55,7 +55,7 @@ The labs follow the official **Microsoft Fabric curriculum** sequence, building 
 | 06 | [06-T-SQL_Data_Warehouse](./06-T-SQL_Data_Warehouse/README.md) | Star schema, stored procedures, cross-database views, analytical T-SQL queries | T-SQL · Star Schema · Stored Procedures |
 | 07 | [07-Monitor_Data_Warehouse](./07-Monitor_Data_Warehouse/README.md) | DMVs, live query monitoring, Query Insights, historical performance analysis | DMVs · sys schema · queryinsights |
 | 08 | [08-Secure_Data_Warehouse](./08-Secure_Data_Warehouse/README.md) | Dynamic Data Masking, Row-Level Security, Column-Level Security, GRANT/DENY | DDM · RLS · CLS · T-SQL DCL |
-| 09 | [09-Real-Time_Intelligence](./09-Real-Time_Intelligence/README.md) | Eventstream, KQL, Eventhouse, Real-Time Dashboard, Activator |
+| 09 | [09-Real-Time_Intelligence](./09-Real-Time_Intelligence/README.md) | Eventstream, Eventhouse, KQL Queries, Real-Time Dashboard, Activator Alert | Eventstream · KQL · Eventhouse · Real-Time Dashboard · Activator |
 
 ---
 
